@@ -1,0 +1,25 @@
+[app]
+name = "workspace-link-example"
+version = "0.1.0"
+description = "Demo app whose 500 error page links to an open-workspace provider so the user can jump into a checkout of the failing commit."
+
+[runtime.container]
+image = "Dockerfile"
+port = 8000
+
+[routing]
+health_check = "/health"
+
+[resources]
+memory_mb = 256
+cpu_millicores = 250
+
+# We consume the open-workspace service so we can discover a deployed provider
+# at runtime (via the router's /api/services/v2/providers) and link users into
+# a workspace at the exact commit that produced a 500. No grants needed — the
+# provider is reached by the user's browser, not by our app, so there is no
+# server-to-server call that needs authorization.
+[[services.v2.consumes]]
+service = "github.com/imbue-openhost/claude-code-container/services/open-workspace"
+shortname = "open-workspace"
+version = ">=0.1.0"
